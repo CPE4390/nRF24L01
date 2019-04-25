@@ -41,8 +41,8 @@ void main(void) {
     rfSetFeatures(rfEN_DPL | rfEN_ACK_PAY);
     rfEnableDynamicPayloadLength(0, rfEnable);
     rfPower(rfON);
-    rfCE = 1;
     ConfigureInterrupts();
+    rfCE = 1;
     while (1) {
         if (dataReady) {
             dataReady = 0;
@@ -118,6 +118,9 @@ void __interrupt(high_priority) HighISR(void) {
             transmitting = 0;
             rfFlushTx();
             rfClearTxMaxRTInterrupt();
+            rfMode(rfRX);
+            strcpy(rxString, "TxError");
+            dataReady = 1;
             rfCE = 1;
         }
         INT3IF = 0;
