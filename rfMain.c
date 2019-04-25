@@ -7,32 +7,20 @@
 
 #include <xc.h>
 
-#if defined __18F8722
-#pragma config OSC=HSPLL
-#pragma config WDT=OFF
-#pragma config LVP=OFF
-#pragma config XINST=OFF
-#elif defined __18F87J11
 #pragma config FOSC=HSPLL
 #pragma config WDTEN=OFF
 #pragma config XINST=OFF
-#else
-#error Invalid processor selection
-#endif
 
-#include "lcd.h"
+#include "LCD.h"
 #include "nRF24L01.h"
-#include <stdio.h>
 #include <string.h>
 
-char txData[32] = {1, 2, 3, 'A', 'B', 'C'};
 char rxData[32];
 char strings[][20] = {"Hello", "Goodbye", "Yes", "No"};
 char rxString[20];
 volatile char n = 0;
 volatile char dataReady = 0;
 char dataLen = 6;
-char lcd[17];
 volatile char transmitting = 0;
 volatile int rxCount = 0;
 
@@ -42,7 +30,7 @@ void ConfigureInterrupts(void);
 void main(void) {
     InitSystem();
     LCDInit();
-    LCDWriteLine("nRF24L01 Demo", 0);
+    lprintf(0, "nRF24L01 Demo");
     rfInit();
     rfSetChannel(82);
     rfSetAutoRetryDelay(1);
@@ -58,11 +46,8 @@ void main(void) {
     while (1) {
         if (dataReady) {
             dataReady = 0;
-            sprintf(lcd, "RX Count=%d", rxCount);
-            LCDClearLine(0);
-            LCDWriteLine(lcd, 0);
-            LCDClearLine(1);
-            LCDWriteLine(rxString, 1);
+            lprintf(0, "RX Count=%d", rxCount);
+            lprintf(1, rxString);
         }
     }
 
@@ -88,7 +73,7 @@ void ConfigureInterrupts(void) {
     PEIE = 1;
 }
 
-void interrupt HighISR(void) {
+void __interrupt(high_priority) HighISR(void) {
     char status;
     char len;
     if (INT0IF) {
@@ -103,8 +88,6 @@ void interrupt HighISR(void) {
                 rfCE = 1;
                 __delay_us(15);
                 rfCE = 0;
-                ++txData[0];
-                ++txData[4];
                 ++n;
                 if (n >= 4) {
                     n = 0;
@@ -136,10 +119,6 @@ void interrupt HighISR(void) {
             rfFlushTx();
             rfClearTxMaxRTInterrupt();
             rfCE = 1;
-            status = rfReadStatus();
-            sprintf(lcd, "%d", status);
-            LCDClearLine(1);
-            LCDWriteLine(lcd, 1);
         }
         INT3IF = 0;
     }
