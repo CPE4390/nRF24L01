@@ -112,6 +112,8 @@ void __interrupt(high_priority) HighISR(void) {
             transmitting = 0;
             rfMode(rfRX);
             rfClearTxInterrupt();
+            strcpy(rxString, "Tx Success");
+            dataReady = 1;
             rfCE = 1;
         }
         if (status & rfTX_MAX_RT_INT) {
@@ -119,7 +121,7 @@ void __interrupt(high_priority) HighISR(void) {
             rfFlushTx();
             rfClearTxMaxRTInterrupt();
             rfMode(rfRX);
-            strcpy(rxString, "TxError");
+            strcpy(rxString, "Tx Error");
             dataReady = 1;
             rfCE = 1;
         }

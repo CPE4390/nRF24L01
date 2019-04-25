@@ -14,7 +14,7 @@
     RD3 = CE
     RD4 = SDO connect to MOSI
     RD5 = SDI connect to MISO
-    RD6 = SCL
+    RD6 = SCK
     RD7 = CSN
  */
 
