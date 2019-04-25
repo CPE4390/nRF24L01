@@ -5,5 +5,6 @@ Supports point to point or star configuration.
 
 ## Suggested improvements/additions
 * Setup a star configuration
-* Improve error handling
-* 
+* Use pipes and addresses
+* Use ACK payload to implement 2-way communication
+* Try different data rates
